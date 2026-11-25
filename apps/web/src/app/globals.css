@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* サードウェーブ系カフェ: 生成り × エスプレッソ、アクセントにテラコッタとセージ */
+:root {
+  --cream: #f6f1e9;
+  --paper: #fffdf9;
+  --oat: #ece3d5;
+  --line: #e2d6c4;
+  --espresso: #2e2219;
+  --roast: #6b4a33;
+  --mute: #8a7a6a;
+  --terracotta: #c2673f;
+  --sage: #7f9271;
+  --alert: #b5482f;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-oat: var(--oat);
+  --color-line: var(--line);
+  --color-espresso: var(--espresso);
+  --color-roast: var(--roast);
+  --color-mute: var(--mute);
+  --color-terracotta: var(--terracotta);
+  --color-sage: var(--sage);
+  --color-alert: var(--alert);
+  --font-sans: var(--font-gothic);
+  --font-serif: var(--font-mincho);
+}
+
+body {
+  background: var(--cream);
+  color: var(--espresso);
+  font-family: var(--font-gothic), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
