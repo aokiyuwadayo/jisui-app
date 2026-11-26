@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "jisui",
+    "slug": "jisui",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.aokiyuwadayo.jisui"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F6F1E9",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.aokiyuwadayo.jisui"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser"
+    ],
+    "scheme": "jisui",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

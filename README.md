@@ -7,6 +7,7 @@
 | パス | 内容 |
 |---|---|
 | `apps/web` | Next.js（スマホ優先の Web / PWA） |
+| `apps/native` | Expo（iOS / Android アプリ） |
 | `packages/backend` | Convex（DB・認証・API） |
 | `packages/core` | Web / Mobile 共通の純粋ロジック（期限判定など） |
 
@@ -19,6 +20,16 @@ pnpm --filter @jisui/web dev       # http://localhost:3000
 ```
 
 `apps/web/.env.local` に `NEXT_PUBLIC_CONVEX_URL` を書く（`.env.example` 参照）。
+
+### ネイティブアプリ
+
+```bash
+pnpm --filter @jisui/native dev    # Expo（QR コードを Expo Go で読む）
+```
+
+`apps/native/.env.local` に `EXPO_PUBLIC_CONVEX_URL` と `EXPO_PUBLIC_APP_URL`（Web 版の URL）を書く。
+Google ログインは Web 版の `/native-callback` を経由してアプリ（`jisui://auth`）に戻る。
+Convex Auth がまだアプリ独自の戻り先に対応していないための中継で、Web 版が公開されている必要がある。
 
 ## 認証のセットアップ（Google ログイン）
 
