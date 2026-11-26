@@ -113,6 +113,14 @@ export default defineSchema({
     .index("by_access", ["accessHash"])
     .index("by_refresh", ["refreshHash"]),
 
+  /** BigQuery への書き出しの進み具合 */
+  exportState: defineTable({
+    key: v.string(),
+    /** ここまでの events（at）を書き出し済み */
+    exportedUntil: v.number(),
+    lastRunAt: v.number(),
+  }).index("by_key", ["key"]),
+
   /** 操作ログ。BigQuery への日次バッチの元データ */
   events: defineTable({
     userId: v.id("users"),

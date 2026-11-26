@@ -11,6 +11,7 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { Sheet } from "@/components/ui/Sheet";
 import { IngredientCard } from "./IngredientCard";
 import { IngredientForm } from "./IngredientForm";
+import { ReceiptImport } from "./ReceiptImport";
 
 type Filter = "all" | Storage | "seasoning";
 
@@ -29,8 +30,8 @@ function matches(item: Doc<"ingredients">, filter: Filter) {
 export function FridgeView() {
   const items = useQuery(api.ingredients.list);
   const [filter, setFilter] = useState<Filter>("all");
-  // undefined: 閉じている / "new": 追加 / Id: 編集
-  const [editing, setEditing] = useState<Id<"ingredients"> | "new" | undefined>();
+  // undefined: 閉じている / "new": 追加 / "receipt": レシートから追加 / Id: 編集
+  const [editing, setEditing] = useState<Id<"ingredients"> | "new" | "receipt" | undefined>();
   const today = todayInTokyo();
 
   const visible = useMemo(() => (items ?? []).filter((i) => matches(i, filter)), [items, filter]);
@@ -46,7 +47,16 @@ export function FridgeView() {
 
   return (
     <section className="pt-2 pb-20">
-      <PageTitle eyebrow="TODAY" title="冷蔵庫" />
+      <div className="flex items-end justify-between gap-3">
+        <PageTitle eyebrow="TODAY" title="冷蔵庫" />
+        <button
+          type="button"
+          onClick={() => setEditing("receipt")}
+          className="mb-5 shrink-0 rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs text-roast"
+        >
+          レシートで追加
+        </button>
+      </div>
 
       {urgent.length > 0 && (
         <div className="mb-5 rounded-2xl bg-terracotta/10 px-4 py-3">
@@ -85,9 +95,10 @@ export function FridgeView() {
       <Sheet
         open={editing !== undefined}
         onClose={() => setEditing(undefined)}
-        title={editing === "new" ? "食材を追加" : "食材を編集"}
+        title={editing === "new" ? "食材を追加" : editing === "receipt" ? "レシートで追加" : "食材を編集"}
       >
-        {editing !== undefined && (
+        {editing === "receipt" && <ReceiptImport onDone={() => setEditing(undefined)} />}
+        {editing !== undefined && editing !== "receipt" && (
           <IngredientForm
             key={editing}
             item={editingItem}
