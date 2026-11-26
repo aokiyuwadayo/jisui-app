@@ -4,12 +4,12 @@ import {
   validateIngredient,
 } from "@jisui/core";
 import { ConvexError, v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query, type QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import { type MutationCtx, mutation, query, type QueryCtx } from "./_generated/server";
 import { logEvent, requireUserId } from "./lib";
 import { category, storage } from "./schema";
 
-const fields = {
+export const ingredientFields = {
   name: v.string(),
   category,
   storage,
@@ -68,19 +68,12 @@ export const history = query({
 });
 
 export const create = mutation({
-  args: fields,
-  handler: async (ctx, args) => {
-    const userId = await requireUserId(ctx);
-    const data = { ...args, name: args.name.trim() };
-    assertValid(data);
-    const id = await ctx.db.insert("ingredients", { ...data, userId, updatedAt: Date.now() });
-    await logEvent(ctx, userId, "ingredient_added", id, data);
-    return id;
-  },
+  args: ingredientFields,
+  handler: async (ctx, args) => createIngredient(ctx, await requireUserId(ctx), args),
 });
 
 export const update = mutation({
-  args: { id: v.id("ingredients"), ...fields },
+  args: { id: v.id("ingredients"), ...ingredientFields },
   handler: async (ctx, { id, ...args }) => {
     const { userId } = await getOwned(ctx, id);
     const data = { ...args, name: args.name.trim() };
@@ -102,15 +95,7 @@ export const adjust = mutation({
   args: { id: v.id("ingredients"), delta: v.number() },
   handler: async (ctx, { id, delta }) => {
     const { userId, item } = await getOwned(ctx, id);
-    const quantity = adjustQuantity(item.quantity, delta);
-    await ctx.db.patch(id, { quantity, updatedAt: Date.now() });
-    await logEvent(ctx, userId, "ingredient_updated", id, {
-      name: item.name,
-      from: item.quantity,
-      to: quantity,
-      unit: item.unit,
-    });
-    return quantity;
+    return setQuantity(ctx, userId, item, adjustQuantity(item.quantity, delta));
   },
 });
 
@@ -122,19 +107,58 @@ export const remove = mutation({
   },
   handler: async (ctx, { id, reason }) => {
     const { userId, item } = await getOwned(ctx, id);
-    await ctx.db.delete(id);
-    await logEvent(
-      ctx,
-      userId,
-      reason === "consumed" ? "ingredient_consumed" : "ingredient_discarded",
-      id,
-      {
-        name: item.name,
-        category: item.category,
-        quantity: item.quantity,
-        unit: item.unit,
-        expiresOn: item.expiresOn,
-      },
-    );
+    await removeIngredient(ctx, userId, item, reason);
   },
 });
+
+// ここから下はアプリと外部連携（REST / MCP）で共通の処理
+
+type IngredientData = Omit<Doc<"ingredients">, "_id" | "_creationTime" | "userId" | "updatedAt">;
+
+export async function createIngredient(ctx: MutationCtx, userId: Id<"users">, args: IngredientData) {
+  const data = { ...args, name: args.name.trim() };
+  assertValid(data);
+  const id = await ctx.db.insert("ingredients", { ...data, userId, updatedAt: Date.now() });
+  await logEvent(ctx, userId, "ingredient_added", id, data);
+  return id;
+}
+
+export async function setQuantity(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  item: Doc<"ingredients">,
+  quantity: number,
+) {
+  const next = adjustQuantity(quantity, 0);
+  await ctx.db.patch(item._id, { quantity: next, updatedAt: Date.now() });
+  await logEvent(ctx, userId, "ingredient_updated", item._id, {
+    name: item.name,
+    from: item.quantity,
+    to: next,
+    unit: item.unit,
+  });
+  return next;
+}
+
+/** 在庫から外す。使い切った（consumed）か捨てた（discarded）かを記録する */
+export async function removeIngredient(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  item: Doc<"ingredients">,
+  reason: "consumed" | "discarded",
+) {
+  await ctx.db.delete(item._id);
+  await logEvent(
+    ctx,
+    userId,
+    reason === "consumed" ? "ingredient_consumed" : "ingredient_discarded",
+    item._id,
+    {
+      name: item.name,
+      category: item.category,
+      quantity: item.quantity,
+      unit: item.unit,
+      expiresOn: item.expiresOn,
+    },
+  );
+}

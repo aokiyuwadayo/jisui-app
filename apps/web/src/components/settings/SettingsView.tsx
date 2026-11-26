@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import { Field } from "@/components/ui/Field";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { ToggleChips } from "@/components/ui/ToggleChips";
+import { ConnectSettings } from "./ConnectSettings";
 
 export function SettingsView() {
   const equipment = useQuery(api.settings.equipment);
@@ -34,6 +35,8 @@ export function SettingsView() {
           <p className="mt-3 text-xs text-mute">未設定のあいだは、器具を問わずに提案します。</p>
         )}
       </div>
+
+      <ConnectSettings />
     </section>
   );
 }

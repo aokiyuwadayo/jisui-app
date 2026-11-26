@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { INGREDIENT_PRESETS, normalizeKana, searchPresets } from "./presets";
+import { INGREDIENT_PRESETS, normalizeKana, presetFor, searchPresets } from "./presets";
 
 describe("normalizeKana", () => {
   it("カタカナをひらがなにする", () => {
@@ -25,5 +25,13 @@ describe("searchPresets", () => {
   it("プリセットの名前が重複していない", () => {
     const names = INGREDIENT_PRESETS.map((p) => p.name);
     expect(new Set(names).size).toBe(names.length);
+  });
+});
+
+describe("presetFor", () => {
+  it("名前か読みの完全一致だけを返す", () => {
+    expect(presetFor("キャベツ")?.storage).toBe("fridge");
+    expect(presetFor("きゃべつ")?.name).toBe("キャベツ");
+    expect(presetFor("きゃべ")).toBeUndefined();
   });
 });

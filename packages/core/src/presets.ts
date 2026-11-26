@@ -113,3 +113,9 @@ export function searchPresets(
     .slice(0, limit)
     .map((s) => s.preset);
 }
+
+/** 名前か読みが完全に一致するプリセット。外部（Muse など）からの登録で既定値を補うのに使う */
+export function presetFor(name: string): IngredientPreset | undefined {
+  const q = normalizeKana(name);
+  return INGREDIENT_PRESETS.find((p) => normalizeKana(p.name) === q || p.kana === q);
+}

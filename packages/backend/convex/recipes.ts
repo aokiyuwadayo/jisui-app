@@ -1,7 +1,8 @@
 import { parseRecipeFromHtml, validateRecipe } from "@jisui/core";
 import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
-import { action, mutation, query, type QueryCtx } from "./_generated/server";
+import type { Infer } from "convex/values";
+import { action, type MutationCtx, mutation, query, type QueryCtx } from "./_generated/server";
 import { logEvent, requireUserId } from "./lib";
 
 export const recipeFields = {
@@ -70,19 +71,7 @@ export const get = query({
 
 export const create = mutation({
   args: recipeFields,
-  handler: async (ctx, args) => {
-    const userId = await requireUserId(ctx);
-    const data = normalize(args);
-    const id = await ctx.db.insert("recipes", {
-      ...data,
-      userId,
-      favorite: false,
-      cookedCount: 0,
-      updatedAt: Date.now(),
-    });
-    await logEvent(ctx, userId, "recipe_saved", id, { title: data.title, sourceUrl: data.sourceUrl });
-    return id;
-  },
+  handler: async (ctx, args) => createRecipe(ctx, await requireUserId(ctx), args),
 });
 
 export const update = mutation({
@@ -128,40 +117,63 @@ export const markCooked = mutation({
   },
 });
 
-const MAX_HTML_BYTES = 3_000_000;
+const recipeData = v.object(recipeFields);
+
+export async function createRecipe(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+  args: Infer<typeof recipeData>,
+) {
+  const data = normalize(args);
+  const id = await ctx.db.insert("recipes", {
+    ...data,
+    userId,
+    favorite: false,
+    cookedCount: 0,
+    updatedAt: Date.now(),
+  });
+  await logEvent(ctx, userId, "recipe_saved", id, { title: data.title, sourceUrl: data.sourceUrl });
+  return id;
+}
 
 /** レシピページの URL から下書きを作る（保存はしない） */
 export const importFromUrl = action({
   args: { url: v.string() },
   handler: async (ctx, { url }) => {
     await requireUserId(ctx);
-    let parsed: URL;
-    try {
-      parsed = new URL(url.trim());
-    } catch {
-      throw new ConvexError("URLの形式が正しくありません");
-    }
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-      throw new ConvexError("http(s) のURLを入力してください");
-    }
-
-    let html: string;
-    try {
-      const res = await fetch(parsed, {
-        headers: { "User-Agent": "Mozilla/5.0 (jisui recipe importer)", Accept: "text/html" },
-        signal: AbortSignal.timeout(10_000),
-      });
-      if (!res.ok) throw new ConvexError(`ページを開けませんでした（${res.status}）`);
-      html = (await res.text()).slice(0, MAX_HTML_BYTES);
-    } catch (e) {
-      if (e instanceof ConvexError) throw e;
-      throw new ConvexError("ページを開けませんでした");
-    }
-
-    const draft = parseRecipeFromHtml(html, parsed.toString());
-    if (!draft) {
-      throw new ConvexError("このページからレシピ情報を読み取れませんでした。手入力してください");
-    }
-    return draft;
+    return fetchRecipeDraft(url);
   },
 });
+
+const MAX_HTML_BYTES = 3_000_000;
+
+export async function fetchRecipeDraft(url: string) {
+  let parsed: URL;
+  try {
+    parsed = new URL(url.trim());
+  } catch {
+    throw new ConvexError("URLの形式が正しくありません");
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    throw new ConvexError("http(s) のURLを入力してください");
+  }
+
+  let html: string;
+  try {
+    const res = await fetch(parsed, {
+      headers: { "User-Agent": "Mozilla/5.0 (jisui recipe importer)", Accept: "text/html" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) throw new ConvexError(`ページを開けませんでした（${res.status}）`);
+    html = (await res.text()).slice(0, MAX_HTML_BYTES);
+  } catch (e) {
+    if (e instanceof ConvexError) throw e;
+    throw new ConvexError("ページを開けませんでした");
+  }
+
+  const draft = parseRecipeFromHtml(html, parsed.toString());
+  if (!draft) {
+    throw new ConvexError("このページからレシピ情報を読み取れませんでした。手入力してください");
+  }
+  return draft;
+}
