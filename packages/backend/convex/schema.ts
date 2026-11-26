@@ -80,6 +80,39 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_hash", ["tokenHash"]),
 
+  /** MCP の OAuth で動的登録されたクライアント（Claude・ChatGPT など） */
+  oauthClients: defineTable({
+    clientId: v.string(),
+    name: v.string(),
+    redirectUris: v.array(v.string()),
+    createdAt: v.number(),
+  }).index("by_client_id", ["clientId"]),
+
+  /** 認可コード。5分で失効し、一度使うと消す */
+  oauthCodes: defineTable({
+    codeHash: v.string(),
+    clientId: v.string(),
+    userId: v.id("users"),
+    redirectUri: v.string(),
+    codeChallenge: v.string(),
+    expiresAt: v.number(),
+  }).index("by_hash", ["codeHash"]),
+
+  /** OAuth で発行したアクセストークンとリフレッシュトークン（ハッシュのみ） */
+  oauthGrants: defineTable({
+    userId: v.id("users"),
+    clientId: v.string(),
+    accessHash: v.string(),
+    accessExpiresAt: v.number(),
+    refreshHash: v.string(),
+    refreshExpiresAt: v.number(),
+    createdAt: v.number(),
+    lastUsedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_access", ["accessHash"])
+    .index("by_refresh", ["refreshHash"]),
+
   /** 操作ログ。BigQuery への日次バッチの元データ */
   events: defineTable({
     userId: v.id("users"),

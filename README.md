@@ -52,7 +52,8 @@ npx convex env set ANTHROPIC_API_KEY <APIキー>
 
 | 連携先 | 登録するもの |
 | --- | --- |
-| MCP に対応したもの（Claude Code・Claude Desktop など） | MCP の URL と `Authorization: Bearer <トークン>` ヘッダー |
+| OAuth 対応の MCP クライアント（claude.ai のカスタムコネクタ・ChatGPT のコネクタなど） | MCP の URL だけ。ブラウザで jisui の同意画面が開くので「許可する」 |
+| ヘッダーを設定できる MCP クライアント（Claude Code など） | MCP の URL と `Authorization: Bearer <トークン>` ヘッダー |
 | ChatGPT の GPT Actions | OpenAPI の URL を読み込み、認証は「API キー / Bearer」でトークン |
 | HTTP で呼べるもの（Muse の自作ツールなど） | `POST <REST API の URL>/<ツール名>` に JSON。一覧は `GET /api/v1/tools` |
 
@@ -60,6 +61,12 @@ npx convex env set ANTHROPIC_API_KEY <APIキー>
 # 例: Claude Code
 claude mcp add --transport http jisui https://<deployment>.convex.site/mcp \
   --header "Authorization: Bearer <トークン>"
+```
+
+OAuth の同意画面はアプリ側にあるので、Convex に アプリの URL を設定しておく（未設定なら `ALLOWED_REDIRECT_ORIGINS` の先頭）。
+
+```bash
+npx convex env set APP_URL https://<アプリのURL>
 ```
 
 使えるツール: 在庫を見る・追加・量や期限を変える・外す、レシピを見る・URL から保存・保存、今日の料理の提案。

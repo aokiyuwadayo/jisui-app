@@ -12,6 +12,8 @@ const dateFormat = new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "nu
 /** Muse・Claude・ChatGPT などから在庫とレシピを扱うための設定 */
 export function ConnectSettings() {
   const tokens = useQuery(api.tokens.list);
+  const connections = useQuery(api.oauth.connections);
+  const disconnect = useMutation(api.oauth.disconnect);
   const createToken = useAction(api.tokens.create);
   const revoke = useMutation(api.tokens.revoke);
   const [name, setName] = useState("Muse");
@@ -38,7 +40,8 @@ export function ConnectSettings() {
         <h3 className="font-serif text-lg font-bold">外部連携</h3>
         <p className="mt-1 text-xs leading-relaxed text-mute">
           Muse や Claude・ChatGPT から在庫の確認・追加、レシピの保存ができます。
-          トークンを発行して、連携先に下の URL と一緒に登録してください。
+          OAuth に対応した連携先（claude.ai のコネクタなど）は MCP の URL だけで繋がります。
+          それ以外はトークンを発行して、URL と一緒に登録してください。
         </p>
       </div>
 
@@ -83,6 +86,32 @@ export function ConnectSettings() {
           </div>
         )}
       </Field>
+
+      {connections && connections.length > 0 && (
+        <Field label="OAuth で接続中">
+          <ul className="divide-y divide-line rounded-xl border border-line">
+            {connections.map((c) => (
+              <li key={c._id} className="flex items-center gap-3 px-3 py-2.5 text-sm">
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{c.name}</span>
+                  <span className="text-[11px] text-mute">
+                    {dateFormat.format(c.createdAt)}に接続
+                    {c.lastUsedAt ? `・${dateFormat.format(c.lastUsedAt)}に使用` : ""}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void disconnect({ id: c._id })}
+                  className="shrink-0 text-xs text-alert"
+                  aria-label={`${c.name}との接続を解除`}
+                >
+                  解除
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Field>
+      )}
 
       {tokens && tokens.length > 0 && (
         <Field label="発行済み">

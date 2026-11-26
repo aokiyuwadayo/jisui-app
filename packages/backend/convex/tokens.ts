@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, mutation, query } from "./_generated/server";
+import { hashToken, randomToken } from "./crypto";
 import { requireUserId } from "./lib";
 
 const PREFIX = "jsk_";
@@ -8,21 +9,12 @@ const MAX_TOKENS = 10;
 /** 最終利用日時の更新は1分に1回まで（毎リクエスト書き込まない） */
 const TOUCH_INTERVAL_MS = 60_000;
 
-function toHex(bytes: ArrayBuffer | Uint8Array) {
-  return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-export async function hashToken(token: string) {
-  return toHex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token)));
-}
-
 /** トークンを発行する。平文はこの戻り値でしか見られない */
 export const create = action({
   args: { name: v.string() },
   handler: async (ctx, { name }): Promise<string> => {
     const userId = await requireUserId(ctx);
-    // 乱数はアクション内で作る（クエリ・ミューテーションの乱数は再現性のため固定される）
-    const token = PREFIX + toHex(crypto.getRandomValues(new Uint8Array(32)));
+    const token = randomToken(PREFIX);
     await ctx.runMutation(internal.tokens.insert, {
       userId,
       name: name.trim().slice(0, 40) || "連携",
