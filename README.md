@@ -31,6 +31,22 @@ pnpm --filter @jisui/native dev    # Expo（QR コードを Expo Go で読む）
 Google ログインは Web 版の `/native-callback` を経由してアプリ（`jisui://auth`）に戻る。
 Convex Auth がまだアプリ独自の戻り先に対応していないための中継で、Web 版が公開されている必要がある。
 
+## 本番環境
+
+| 役割 | 置き場所 | 出し方 |
+|---|---|---|
+| Web 版 | Vercel（Root Directory `apps/web`、環境変数 `NEXT_PUBLIC_CONVEX_URL`） | main にマージすると自動で公開 |
+| バックエンド | Convex の production | 下のとおりデプロイキーで手元から |
+
+Convex はデプロイキーで操作し、`npx convex login` は使わない（パソコン全体のログインを切り替えないため）。
+キーはリポジトリの外（例: `~/.config/jisui/convex-deploy-key`、権限 600）に置く。
+
+```bash
+cd packages/backend
+export CONVEX_DEPLOY_KEY="$(cat ~/.config/jisui/convex-deploy-key)"
+npx convex deploy
+```
+
 ## 認証のセットアップ（Google ログイン）
 
 1. Google Cloud で OAuth クライアント（ウェブアプリケーション）を作る
