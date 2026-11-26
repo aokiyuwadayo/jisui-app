@@ -20,6 +20,7 @@ import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useMemo, useState } from "react";
 import { Chips } from "@/components/ui/Chips";
+import { Field, inputClass } from "@/components/ui/Field";
 
 type Draft = {
   name: string;
@@ -56,9 +57,6 @@ function toDraft(item: Doc<"ingredients"> | undefined, today: string): Draft {
     note: item.note ?? "",
   };
 }
-
-const inputClass =
-  "w-full rounded-xl border border-line bg-cream px-3.5 py-2.5 text-[16px] outline-none focus:border-roast";
 
 export function IngredientForm({
   item,
@@ -322,14 +320,5 @@ export function IngredientForm({
         </div>
       )}
     </form>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <p className="mb-2 text-xs font-medium tracking-wider text-mute">{label}</p>
-      {children}
-    </div>
   );
 }

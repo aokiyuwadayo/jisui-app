@@ -20,6 +20,8 @@ export default defineSchema({
     email: v.string(),
     name: v.optional(v.string()),
     image: v.optional(v.string()),
+    /** 持っている器具。未設定なら提案で器具を問わない */
+    equipment: v.optional(v.array(v.string())),
   }).index("by_email", ["email"]),
 
   /** 食材・調味料の在庫 */
