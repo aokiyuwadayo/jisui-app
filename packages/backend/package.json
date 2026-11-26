@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "convex dev",
-    "typecheck": "tsc --noEmit -p convex"
+    "typecheck": "tsc --noEmit -p convex",
+    "test": "vitest run"
   },
   "dependencies": {
     "@auth/core": "^0.41.3",
@@ -18,7 +19,12 @@
     "convex": "^1.51.0"
   },
   "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
     "@types/node": "^22.20.5",
-    "typescript": "^5"
+    "convex-test": "^0.0.75",
+    "jose": "^6.2.18",
+    "typescript": "^5",
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12"
   }
 }

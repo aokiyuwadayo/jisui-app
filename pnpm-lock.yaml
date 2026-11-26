@@ -76,12 +76,27 @@ importers:
         specifier: ^1.51.0
         version: 1.51.0(react@19.3.0)
     devDependencies:
+      '@edge-runtime/vm':
+        specifier: ^5.0.0
+        version: 5.0.0
       '@types/node':
         specifier: ^22.20.5
         version: 22.20.5
+      convex-test:
+        specifier: ^0.0.75
+        version: 0.0.75(convex@1.51.0(react@19.3.0))
+      jose:
+        specifier: ^6.2.18
+        version: 6.2.18
       typescript:
         specifier: ^5
         version: 5.9.3
+      vite:
+        specifier: ^8.3.8
+        version: 8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@edge-runtime/vm@5.0.0)(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0))
 
   packages/core:
     devDependencies:
@@ -90,7 +105,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4
-        version: 4.1.12(@types/node@20.19.43)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0))
+        version: 4.1.12(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0))
 
 packages:
 
@@ -207,6 +222,14 @@ packages:
     peerDependenciesMeta:
       react:
         optional: true
+
+  '@edge-runtime/primitives@6.0.0':
+    resolution: {integrity: sha512-FqoxaBT+prPBHBwE1WXS1ocnu/VLTQyZ6NMUBAdbP7N2hsFTTxMC/jMu2D/8GAlMQfxeuppcPuCUk/HO3fpIvA==}
+    engines: {node: '>=18'}
+
+  '@edge-runtime/vm@5.0.0':
+    resolution: {integrity: sha512-NKBGBSIKUG584qrS1tyxVpX/AKJKQw5HgjYEnPLC0QsTw79JrGn+qUr8CXFb955Iy7GUdiiUv1rJ6JBGvaKb6w==}
+    engines: {node: '>=18'}
 
   '@emnapi/core@2.0.0-beta.2':
     resolution: {integrity: sha512-MzCVoWtcg4Pm2B3je5mMvYMvj3MmBKw+fU7vbsJc9/iT8ip6/eYIHo/Dsm/mr+wsHB6SEyJDuxB09Yy6r/8+4A==}
@@ -1432,6 +1455,11 @@ packages:
         optional: true
       zod:
         optional: true
+
+  convex-test@0.0.75:
+    resolution: {integrity: sha512-gdy/Hbk9ElB0cc8YDMUsNaI1b1sJlCAkgg1e8nUAzMHuJQWjrErs53IFsyWHene+Grbhi/S9s8lK5WE81/CFoA==}
+    peerDependencies:
+      convex: ^1.46.0
 
   convex@1.51.0:
     resolution: {integrity: sha512-Y5gS+JmT2JBq76S3CrQDrdL/Ijs4ZRKsvz3cu5EmHf/QxW18QrHunb5j9WC6lAbWbWc/gvmqpa5lvXzLXFQVJA==}
@@ -3014,6 +3042,12 @@ snapshots:
     optionalDependencies:
       react: 19.3.0
 
+  '@edge-runtime/primitives@6.0.0': {}
+
+  '@edge-runtime/vm@5.0.0':
+    dependencies:
+      '@edge-runtime/primitives': 6.0.0
+
   '@emnapi/core@2.0.0-beta.2':
     dependencies:
       '@emnapi/wasi-threads': 2.2.0
@@ -4066,6 +4100,10 @@ snapshots:
       react: 19.3.0
       typescript: 5.9.3
       zod: 4.6.7
+
+  convex-test@0.0.75(convex@1.51.0(react@19.3.0)):
+    dependencies:
+      convex: 1.51.0(react@19.3.0)
 
   convex@1.51.0(react@19.3.0):
     dependencies:
@@ -5642,7 +5680,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
 
-  vitest@4.1.12(@types/node@20.19.43)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)):
+  vitest@4.1.12(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)):
     dependencies:
       '@vitest/expect': 4.1.12
       '@vitest/mocker': 4.1.12(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0))
@@ -5665,7 +5703,36 @@ snapshots:
       vite: 8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
+      '@edge-runtime/vm': 5.0.0
       '@types/node': 20.19.43
+    transitivePeerDependencies:
+      - msw
+
+  vitest@4.1.12(@edge-runtime/vm@5.0.0)(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)):
+    dependencies:
+      '@vitest/expect': 4.1.12
+      '@vitest/mocker': 4.1.12(vite@8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0))
+      '@vitest/pretty-format': 4.1.12
+      '@vitest/runner': 4.1.12
+      '@vitest/snapshot': 4.1.12
+      '@vitest/spy': 4.1.12
+      '@vitest/utils': 4.1.12
+      es-module-lexer: 2.3.2
+      expect-type: 1.4.0
+      magic-string: 0.30.21
+      obug: 2.2.1
+      pathe: 2.0.3
+      picomatch: 4.0.7
+      std-env: 4.3.0
+      tinybench: 2.9.0
+      tinyexec: 1.3.1
+      tinyglobby: 0.2.17
+      tinyrainbow: 3.2.0
+      vite: 8.3.8(@types/node@22.20.5)(esbuild@0.27.0)(jiti@2.7.0)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@edge-runtime/vm': 5.0.0
+      '@types/node': 22.20.5
     transitivePeerDependencies:
       - msw
 

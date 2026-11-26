@@ -1,23 +1,10 @@
 import { defineSchema, defineTable } from "convex/server";
+import { CATEGORIES, STORAGES } from "@jisui/core";
 import { v } from "convex/values";
 
-export const storage = v.union(
-  v.literal("fridge"),
-  v.literal("freezer"),
-  v.literal("pantry"),
-);
+export const storage = v.union(...STORAGES.map((s) => v.literal(s)));
 
-export const category = v.union(
-  v.literal("vegetable"),
-  v.literal("fruit"),
-  v.literal("meat"),
-  v.literal("fish"),
-  v.literal("dairy"),
-  v.literal("egg"),
-  v.literal("grain"),
-  v.literal("seasoning"),
-  v.literal("other"),
-);
+export const category = v.union(...CATEGORIES.map((c) => v.literal(c)));
 
 export const eventType = v.union(
   v.literal("ingredient_added"),

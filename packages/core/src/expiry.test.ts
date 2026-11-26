@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysUntil, expiryStatus, parseDate, todayInTokyo } from "./expiry";
+import { addDays, daysUntil, expiryLabel, expiryStatus, parseDate, todayInTokyo } from "./expiry";
 
 describe("parseDate", () => {
   it("正しい日付を読める", () => {
@@ -43,5 +43,18 @@ describe("addDays", () => {
   it("日数を足せる", () => {
     expect(addDays("2026-11-30", 3)).toBe("2026-12-03");
     expect(addDays("bad", 1)).toBeNull();
+  });
+});
+
+describe("expiryLabel", () => {
+  const today = "2026-11-26";
+  it.each([
+    [undefined, "期限なし"],
+    ["2026-11-23", "3日過ぎ"],
+    ["2026-11-26", "今日まで"],
+    ["2026-11-28", "あと2日"],
+    ["2026-12-05", "12/5まで"],
+  ] as const)("%s → %s", (expiresOn, expected) => {
+    expect(expiryLabel(expiresOn, today)).toBe(expected);
   });
 });
