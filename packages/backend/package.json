@@ -13,10 +13,12 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
     "@auth/core": "^0.41.3",
     "@convex-dev/auth": "^2.1.0",
     "@jisui/core": "workspace:*",
-    "convex": "^1.51.0"
+    "convex": "^1.51.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",

@@ -6,6 +6,8 @@ import { expiryStatus, STORAGE_LABELS, STORAGES, type Storage, todayInTokyo } fr
 import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { Chips } from "@/components/ui/Chips";
+import { Fab } from "@/components/ui/Fab";
+import { PageTitle } from "@/components/ui/PageTitle";
 import { Sheet } from "@/components/ui/Sheet";
 import { IngredientCard } from "./IngredientCard";
 import { IngredientForm } from "./IngredientForm";
@@ -44,10 +46,7 @@ export function FridgeView() {
 
   return (
     <section className="pt-2 pb-20">
-      <div className="mb-5">
-        <p className="text-xs tracking-[0.3em] text-mute">TODAY</p>
-        <h2 className="mt-1 font-serif text-2xl font-bold">冷蔵庫</h2>
-      </div>
+      <PageTitle eyebrow="TODAY" title="冷蔵庫" />
 
       {urgent.length > 0 && (
         <div className="mb-5 rounded-2xl bg-terracotta/10 px-4 py-3">
@@ -81,14 +80,7 @@ export function FridgeView() {
         </ul>
       )}
 
-      <button
-        type="button"
-        aria-label="食材を追加"
-        onClick={() => setEditing("new")}
-        className="fixed right-5 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] grid h-14 w-14 place-items-center rounded-full bg-terracotta text-2xl text-paper shadow-lg shadow-terracotta/30 active:scale-95"
-      >
-        ＋
-      </button>
+      <Fab label="食材を追加" onClick={() => setEditing("new")} />
 
       <Sheet
         open={editing !== undefined}

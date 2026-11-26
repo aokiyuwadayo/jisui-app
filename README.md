@@ -36,6 +36,15 @@ npx convex env set ALLOWED_REDIRECT_ORIGINS http://localhost:3000,<本番URL>
 
 `ALLOWED_EMAILS` にないアカウントはログインできない。
 
+## AI 提案
+
+「提案」画面の AI 提案は Claude API を使う。個人の Anthropic アカウントで API キーを作り、Convex に設定する。
+未設定でもレシピブックからの提案は使える。
+
+```bash
+npx convex env set ANTHROPIC_API_KEY <APIキー>
+```
+
 ## チェック
 
 ```bash

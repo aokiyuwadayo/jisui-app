@@ -8,9 +8,13 @@
  * @module
  */
 
+import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as ingredients from "../ingredients.js";
 import type * as lib from "../lib.js";
+import type * as recipes from "../recipes.js";
+import type * as settings from "../settings.js";
+import type * as suggestions from "../suggestions.js";
 import type * as users from "../users.js";
 
 import type {
@@ -20,9 +24,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ai: typeof ai;
   auth: typeof auth;
   ingredients: typeof ingredients;
   lib: typeof lib;
+  recipes: typeof recipes;
+  settings: typeof settings;
+  suggestions: typeof suggestions;
   users: typeof users;
 }>;
 

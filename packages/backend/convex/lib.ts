@@ -1,12 +1,13 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, type Infer } from "convex/values";
 import type { Id } from "./_generated/dataModel";
-import type { MutationCtx, QueryCtx } from "./_generated/server";
+import type { ActionCtx, MutationCtx, QueryCtx } from "./_generated/server";
 import type { eventType } from "./schema";
 
-/** ログイン必須の関数で使う。未ログインなら例外 */
-export async function requireUserId(ctx: QueryCtx) {
-  const userId = await getAuthUserId(ctx);
+/** ログイン必須の関数で使う。未ログインなら例外。アクションからも呼べる */
+export async function requireUserId(ctx: QueryCtx | ActionCtx) {
+  // アクションの runQuery は型上の引数が少し違うだけで、実行時は同じように使える
+  const userId = await getAuthUserId(ctx as QueryCtx);
   if (userId === null) throw new ConvexError("ログインが必要です");
   return userId;
 }
