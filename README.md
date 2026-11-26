@@ -45,6 +45,25 @@ npx convex env set ALLOWED_REDIRECT_ORIGINS http://localhost:3000,<本番URL>
 npx convex env set ANTHROPIC_API_KEY <APIキー>
 ```
 
+## 外部連携（Muse・Claude・ChatGPT）
+
+アプリの「設定 → 外部連携」でトークンを発行し、表示される URL と一緒に連携先へ登録する。
+トークンは発行時に一度だけ表示される。漏れたら同じ画面で削除する。
+
+| 連携先 | 登録するもの |
+| --- | --- |
+| MCP に対応したもの（Claude Code・Claude Desktop など） | MCP の URL と `Authorization: Bearer <トークン>` ヘッダー |
+| ChatGPT の GPT Actions | OpenAPI の URL を読み込み、認証は「API キー / Bearer」でトークン |
+| HTTP で呼べるもの（Muse の自作ツールなど） | `POST <REST API の URL>/<ツール名>` に JSON。一覧は `GET /api/v1/tools` |
+
+```bash
+# 例: Claude Code
+claude mcp add --transport http jisui https://<deployment>.convex.site/mcp \
+  --header "Authorization: Bearer <トークン>"
+```
+
+使えるツール: 在庫を見る・追加・量や期限を変える・外す、レシピを見る・URL から保存・保存、今日の料理の提案。
+
 ## チェック
 
 ```bash

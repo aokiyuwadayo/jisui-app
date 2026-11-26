@@ -66,6 +66,20 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
 
+  /** 外部連携（Muse・Claude・ChatGPT など）用のアクセストークン。平文は保存しない */
+  apiTokens: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    /** SHA-256（16進） */
+    tokenHash: v.string(),
+    /** 一覧で見分けるための末尾4文字 */
+    hint: v.string(),
+    createdAt: v.number(),
+    lastUsedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_hash", ["tokenHash"]),
+
   /** 操作ログ。BigQuery への日次バッチの元データ */
   events: defineTable({
     userId: v.id("users"),
