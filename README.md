@@ -39,10 +39,28 @@ npx convex env set ALLOWED_REDIRECT_ORIGINS http://localhost:3000,<本番URL>
 ## AI 提案
 
 「提案」画面の AI 提案は Claude API を使う。個人の Anthropic アカウントで API キーを作り、Convex に設定する。
-未設定でもレシピブックからの提案は使える。
+「冷蔵庫 → レシートで追加」の読み取りも同じキーを使う。
+未設定でもレシピブックからの提案と手入力は使える。
 
 ```bash
 npx convex env set ANTHROPIC_API_KEY <APIキー>
+```
+
+## BigQuery への日次バッチ
+
+毎日 日本時間4時に、操作ログ（`events`）と在庫の写し（`inventory_snapshots`）を BigQuery に書き出す。
+データセットとテーブルは初回に自動で作る。未設定なら何もしない。
+
+1. 個人の Google Cloud でサービスアカウントを作り、「BigQuery データ編集者」と「BigQuery ジョブユーザー」を付ける
+2. JSON の鍵を作り、Convex に設定する
+
+```bash
+npx convex env set GCP_SERVICE_ACCOUNT_JSON "$(cat key.json)"
+# 任意（既定: jisui / asia-northeast1 / 鍵のプロジェクト）
+npx convex env set BIGQUERY_DATASET jisui
+npx convex env set BIGQUERY_LOCATION asia-northeast1
+# すぐに試す
+npx convex run bigquery:run
 ```
 
 ## 外部連携（Muse・Claude・ChatGPT）

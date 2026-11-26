@@ -90,6 +90,18 @@ export const update = mutation({
   },
 });
 
+/** まとめて追加する（レシートの読み取り結果など） */
+export const createMany = mutation({
+  args: { items: v.array(v.object(ingredientFields)) },
+  handler: async (ctx, { items }) => {
+    const userId = await requireUserId(ctx);
+    if (items.length > 100) throw new ConvexError("一度に追加できるのは100件までです");
+    const ids = [];
+    for (const item of items) ids.push(await createIngredient(ctx, userId, item));
+    return ids;
+  },
+});
+
 /** 量を増減する（＋/− ボタン） */
 export const adjust = mutation({
   args: { id: v.id("ingredients"), delta: v.number() },
