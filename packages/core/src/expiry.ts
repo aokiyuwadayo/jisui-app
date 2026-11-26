@@ -47,3 +47,15 @@ export function addDays(date: string, days: number): string | null {
   if (time === null) return null;
   return new Date(time + days * DAY_MS).toISOString().slice(0, 10);
 }
+
+/** 一覧に出す期限の短い表示 */
+export function expiryLabel(expiresOn: string | undefined, today: string): string {
+  if (!expiresOn) return "期限なし";
+  const days = daysUntil(expiresOn, today);
+  if (days === null) return "期限なし";
+  if (days < 0) return `${-days}日過ぎ`;
+  if (days === 0) return "今日まで";
+  if (days <= 6) return `あと${days}日`;
+  const [, m, d] = expiresOn.split("-");
+  return `${Number(m)}/${Number(d)}まで`;
+}
